@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -309,6 +311,8 @@ class _BookingCalendarMainState extends State<BookingCalendarMain> {
                                     selectedSlotColor: widget.selectedSlotColor,
                                     isPauseTime:
                                         controller.isSlotInPauseTime(slot),
+                                    totalPositions: 10,
+                                    filledPositions: Random().nextInt(10) + 1,
                                     isBooked: controller.isSlotBooked(index),
                                     isSelected:
                                         index == controller.selectedSlot,
