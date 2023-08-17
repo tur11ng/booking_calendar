@@ -1,4 +1,3 @@
-import 'package:booking_calendar/src/components/common_card.dart';
 import 'package:flutter/material.dart';
 
 class BookingSlot extends StatelessWidget {
@@ -9,66 +8,95 @@ class BookingSlot extends StatelessWidget {
     required this.onTap,
     required this.isSelected,
     required this.isPauseTime,
-    required this.totalPositions,
-    required this.filledPositions,
     this.bookedSlotColor,
     this.selectedSlotColor,
     this.availableSlotColor,
     this.pauseSlotColor,
     this.hideBreakSlot,
+    required this.totalPositions,
+    required this.filledPositions,
   }) : super(key: key);
 
   final Widget child;
   final bool isBooked;
   final bool isPauseTime;
   final bool isSelected;
-  final bool? hideBreakSlot;
-  final int totalPositions;
-  final int filledPositions;
   final VoidCallback onTap;
   final Color? bookedSlotColor;
   final Color? selectedSlotColor;
   final Color? availableSlotColor;
   final Color? pauseSlotColor;
+  final bool? hideBreakSlot;
+  final int totalPositions;
+  final int filledPositions;
 
-  Color getSlotColor() {
-    if (isPauseTime) {
-      return pauseSlotColor ?? Colors.grey;
-    }
-
-    if (isBooked) {
-      return bookedSlotColor ?? Colors.redAccent;
+  Color calculatePositionColor() {
+    double percentage = (totalPositions - filledPositions) / totalPositions;
+    if (percentage <= 0.1) {
+      return Colors.red.withOpacity(0.7);
+    } else if (percentage <= 0.3) {
+      return Colors.yellow.withOpacity(0.7);
     } else {
-      return isSelected
-          ? selectedSlotColor ?? Colors.orangeAccent
-          : availableSlotColor ?? calculatePositionColors(); // modified
+      return Colors.green.withOpacity(0.7);
     }
   }
 
-  // added
-  Color calculatePositionColors() {
-    int remainingPositions = totalPositions - filledPositions;
-    if (remainingPositions <= 2) {
-      return Colors.red;
-    } else if (remainingPositions <= 4) {
-      return Colors.orange;
-    } else {
-      return Colors.green;
-    }
+  String availableSlotsText() {
+    int remaining = totalPositions - filledPositions;
+    return '$filledPositions / $totalPositions';
   }
 
   @override
   Widget build(BuildContext context) {
+    final slotColor = calculatePositionColor();
+    final percentage = filledPositions / totalPositions;
+
     return (hideBreakSlot != null && hideBreakSlot == true && isPauseTime)
         ? const SizedBox()
-        : GestureDetector(
-            onTap: (!isBooked && !isPauseTime) ? onTap : null,
-            child: CommonCard(
-                margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                color: getSlotColor(),
-                child: child),
-          );
+        : InkWell(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(15),
+          child: Stack(
+            children: [
+              Align(
+                alignment: Alignment.centerRight,
+                child: FractionallySizedBox(
+                  widthFactor: 1 - percentage,
+                  child: Container(
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+              FractionallySizedBox(
+                alignment: Alignment.centerRight,
+                widthFactor: percentage,
+                child: Container(
+                  color: slotColor,
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      child,
+                      Text(availableSlotsText()),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(15),
+          color: Colors.white,
+        ),
+      ),
+    );
   }
 }

@@ -312,7 +312,7 @@ class _BookingCalendarMainState extends State<BookingCalendarMain> {
                                     isPauseTime:
                                         controller.isSlotInPauseTime(slot),
                                     totalPositions: 10,
-                                    filledPositions: Random().nextInt(10) + 1,
+                                    filledPositions: 8,
                                     isBooked: controller.isSlotBooked(index),
                                     isSelected:
                                         index == controller.selectedSlot,
